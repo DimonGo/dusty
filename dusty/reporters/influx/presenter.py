@@ -42,6 +42,7 @@ class InfluxPresenter:
         project_name = self.context.get_meta("project_name", "None")
         build_id = f"{execution_time} - {project_name}"
         test_type = self.context.get_meta("testing_type", "None")
+        suite_name = self.context.suite
         jira_mapping = self.context.performers["reporting"].get_module_meta(
             "jira", "mapping", dict()
         )
@@ -73,7 +74,8 @@ class InfluxPresenter:
                 "build_id": build_id,
                 "test_name": test_type,
                 "type": test_type,
-                "project": project_name
+                "project": project_name,
+                "suite": suite_name
             },
             "fields": results_by_severity
         })
