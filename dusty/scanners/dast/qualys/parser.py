@@ -61,12 +61,9 @@ def parse_findings(data, scanner):
                     f'//INFORMATION_GATHERED_LIST/INFORMATION_GATHERED/QID[text()="{_qid}"]/..'
                 )
                 for record in records:
-                    try:
-                        references.append(html.escape(
-                            base64.b64decode(record.findtext("DATA")).decode("utf-8", errors="ignore")
-                        ))
-                    except TypeError as error:
-                        log.debug("Couldn't found 'DATA' in record. Stacktrace: %s", error)
+                    references.append(html.escape(
+                        base64.b64decode(record.findtext("DATA")).decode("utf-8", errors="ignore")
+                    ))
             else:
                 records = obj.xpath(f'//VULNERABILITY_LIST/VULNERABILITY/QID[text()="{_qid}"]/..')
                 for record in records:
