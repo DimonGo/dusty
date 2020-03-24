@@ -22,6 +22,7 @@
 
 import datetime
 from time import time
+from os import environ as env
 
 from dusty.constants import SEVERITIES
 
@@ -43,6 +44,32 @@ class InfluxPresenter:
         build_id = f"{execution_time} - {project_name}"
         test_type = self.context.get_meta("testing_type", "None")
         suite_name = self.context.suite
+        job_url = ""
+        try:
+            # CI Job URL:
+            if env['BUILD_URL'] is not None:
+                job_url = env['BUILD_URL']
+            elif env['Build.BuildUri'] is not None:
+                job_url = env['Build.BuildUri']
+            elif env['CI_JOB_URL'] is not None:
+                job_url = env['CI_JOB_URL']
+            elif env['TRAVIS_BUILD_WEB_URL'] is not None:
+                job_url = env['TRAVIS_BUILD_WEB_URL']
+
+            # jenkins_build_url = env['BUILD_URL'] if len(env['BUILD_URL']) > 1 else None
+            # azure_build_url = env['Build.BuildUri'] if len(env['Build.BuildUri']) > 1 else None
+            # gitlabci_build_url = env['CI_JOB_URL'] if len(env['CI_JOB_URL']) > 1 else None
+            # travis_build_url = env['TRAVIS_BUILD_WEB_URL'] if len(env['TRAVIS_BUILD_WEB_URL']) > 1 else None
+            # ci_build_url = {
+            #     'jenkins_build_url': jenkins_build_url,
+            #     'azure_build_url': azure_build_url,
+            #     'gitlabci_build_url': gitlabci_build_url,
+            #     'travis_build_url': travis_build_url
+            # }
+            # job_url = [url if url is not None else "-" for url in ci_build_url]
+
+        except:
+            job_url = "-"
         jira_mapping = self.context.performers["reporting"].get_module_meta(
             "jira", "mapping", dict()
         )
@@ -75,7 +102,8 @@ class InfluxPresenter:
                 "test_name": test_type,
                 "type": test_type,
                 "project": project_name,
-                "suite": suite_name
+                "suite": suite_name,
+                "job_url": job_url,
             },
             "fields": results_by_severity
         })
